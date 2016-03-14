@@ -1,10 +1,10 @@
 
 public class BPlusTreeNode {
 	
-	private BPlusTreeNode parents,next,prev;
+	private BPlusTreeNode parents,next,prev;//nodes connections
 	private IntNode[] elements ; //used for leaf - store <SearchKey,Address> pair data
-	private int[] indexs;
-	private BPlusTreeNode[] nextlevels;
+	private int[] indexs; //used for store the index
+	private BPlusTreeNode[] nextlevels; //used for connect to next level leaf
 	private int order,nodeNum,nodePosn;// nodeNum is total number of elements or index inside of this TreeNode  nodePosn is the current posn of this node in parents 
 	//root
 	public BPlusTreeNode(int order){
