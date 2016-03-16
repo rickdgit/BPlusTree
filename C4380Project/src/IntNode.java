@@ -24,6 +24,7 @@ public class IntNode implements Comparable<IntNode>{
 		// TODO Auto-generated method stub
 		int res = 0;
 		return  res = this.searchKey > obj.getSearchKey()?1:(this.searchKey == obj.getSearchKey()?0:-1);
+		//Test
 	}
 
 }
