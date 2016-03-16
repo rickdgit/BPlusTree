@@ -1,14 +1,14 @@
 
 //Using Order as the minimal number of data in a bucket
 public class BPlusTreeNode {
-	
+
 	private BPlusTreeNode parents,next,prev;//nodes connections
 	private IntNode[] elements ; //used for leaf - store <SearchKey,Address> pair data
 	private int[] indexs; //used for store the index
 	private BPlusTreeNode[] nextlevels; //used for connect to next level leaf
-	// nodeNum is total number of elements or index inside of this TreeNode 
-	// nodePosn is the current posn of this node in parents 
-	private int order,nodeNum,nodePosn; 
+	// nodeNum is total number of elements or index inside of this TreeNode
+	// nodePosn is the current posn of this node in parents
+	private int order,nodeNum,nodePosn;
 	//root
 	public BPlusTreeNode(int order){
 		this.setOrder(order);
@@ -20,7 +20,7 @@ public class BPlusTreeNode {
 		this.setElements(null);
 		this.setNextlevels(new BPlusTreeNode[order*2+1]);
 		this.setIndexs(new int[order*2]);
-		
+
 	}
 	//middle node
 	public BPlusTreeNode(int order,int nodePosn,BPlusTreeNode parents){
@@ -47,42 +47,42 @@ public class BPlusTreeNode {
 		this.nodePosn = nodePosn;
 	}
 	public void insert(int searchKey){
-		
-		
+
+
 		//Base case
 			//Element or index could be inserted successfully
 		if(this.nodeNum<=(2*order-1)){
-			
+
 		}
 		//Recursive Case
 			//No space for insert, need to be split then recursively call parents insert
 		else{
-		
+
 			int median = findMedian(this,searchKey);
 		}
 	}
 	public int findMedian(BPlusTreeNode bp,int searchKey){
 		//Check it is a leaf node or not
 		if(bp.getIndexs() == null){
-			
+
 		}
 		else{
-			
+
 		}
-		
-		
+
+
 		return bp.getNodeNum()+searchKey;
 	}
 	//Used for search the location of searchKey OR used for search the apporixmate location of searchKey
 	public int binarySearch(int[] arr,int searchKey){
 		int res = 0;
-		
+
 		return res;
 	}
 	//Used for get inserted values's left& right nodes
-	
+
 	public void delete(int searchKey){
-		
+
 	}
 	public BPlusTreeNode search(int searchKey){
 		return null;
