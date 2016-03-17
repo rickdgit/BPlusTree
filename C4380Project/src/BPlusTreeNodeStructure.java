@@ -51,11 +51,14 @@ public class BPlusTreeNodeStructure {
 		///If not full, insert directly
 		//If full , split into a subnode that use a median as root while split the left into two
 		//leaf node, meanwhile change the nodePosn of each new leaf node
-	public void insert(IntNode obj){
+	public BPlueTreeNode insert(IntNode obj){
+		//Pointer that need to be returned
+		BPlueTreeNode res = null;
 		//base case - check the spacing - if space is enough - insert directly
 		if(this.nodeNum<this.order*2){
 			//less than 2*order => at least 1 in posn extra in elements
 			this.insertElement(IntNode obj);
+			return this;
 		}
 		//Recursive Case - the space is not enouth, split the node and upload to parents
 		else{
@@ -85,14 +88,15 @@ public class BPlusTreeNodeStructure {
 				BPlueTreeNode temp = new BPlueTreeNode(this.order,this.nodePosn,this.parents);
 				//right child of sub node	- leaf node
 				BPlueTreeNode tempRightLeaf = null;
-				//left child of sub node - leaf node
-					//Make a new leaf node that only contains elements
-				BPlueTreeNode tempLeftLeaf = new BPlueTreeNode(this.order,0,temp,tempRightLeaf,null);
-					//Fill the left elements in
-				tempLeftLeaf.setElements(first);
+				//left child of sub node - leaf node -- should keep the original one
+					//modify the original node so that we do not need to connect with prev node
+					this.setElements(first);
+					this.setNext(tempRightLeaf);
+					this.setParents(temp);
+				// BPlueTreeNode tempLeftLeaf = new BPlueTreeNode(this.order,0,temp,tempRightLeaf,null);
 				//Continus right child
 					//make right right node content
-				tempRightLeaf = BPlueTreeNode(this.order,1,temp,null,tempLeftLeaf);
+				tempRightLeaf = BPlueTreeNode(this.order,1,temp,null,this);
 					//Fill right elements in
 				tempRightLeaf.setElements(second);
 				//Root
@@ -106,11 +110,18 @@ public class BPlusTreeNodeStructure {
 						// Make a new nextlevel array
 				BPlueTreeNode tempNextLevel = new BPlueTreeNode[order*2+1];
 						//Assign left
-				tempNextLevel[0] = tempLeftLeaf;
+				tempNextLevel[0] = this;
 						//Assign right
 				tempNextLevel[1] = tempRightLeaf;
 			//FInally, Call parents for insert the new node
-			this.parents.insert(temp);
+			//Check parents is null - if only one node in whole structure
+			if(this.parents != null){
+				res = this.parents.insert(temp);
+			}
+			else{//if parents is null, this node will be the new node
+				res = this;
+			}
+			return res;
 		}
 	}
 	//Insert the element to the leaf node only
@@ -129,20 +140,62 @@ public class BPlusTreeNodeStructure {
 		return 0;
 	}
 	//insert for non-leaf node
-	public void insert(BPlusTreeNode obj){
+	public BPlueTreeNode insert(BPlusTreeNode obj){
+		BPlueTreeNode res = null;
 		//base case - check the spacing - if space is enouth
+		if(this.indexs<2*order){
+			res = insertBPNode(obj);
+		}
+		//Recursive Case - split & make a new BPlueTreeNode and upload
+		else{
 
-		//Recursive Case -
+		}
 	}
 	//Used for build the basic insertion of non-leaf node
 		//Find the correct spot,add the elements
 		//NEED to fix the child's posn
-	public void insertBPNode(BPlueTreeNode subtree){
-
-		//Fix child's posn
-		
+	public BPlueTreeNode insertBPNode(BPlueTreeNode subtree){
+		//move afterwards indexs and pointers - make 1 spot for target
+		//The POSN should be obj's POSN
+		int POSN = obj.nodePosn;
+		this.indexs = moveBack(this.indexs,POSN);
+		this.nextlevel = moveBack(this.nextlevel,POSN);
+		//Put the target right on spot
+		this.indexs[posn] = subtree.indexs[0];
+		//put left child into target 's left - Even it's original one,assigned again
+		this.nextlevel[posn] = subtree.nextlevel[0];
+		//put right child into target's right
+		this.nextlevel[posn+1] = subtree.nextlevel[1];
+		this.nextlevel[posn+1].nodePosn = posn+1;
+		return this;
+	}
+	//make the empty spon avaliablity
+	public int[] moveBack(int[] temp, int posn){
+		int[] arr = new int[2*this.order];
+		int count = 0;
+		for(int i : temp){
+			if(count==posn){
+				count++;
+			}
+			arr[count] = i;
+			count++;
+		}
+		return arr;
+	}
+	public BPlueTreeNode[] moveBack(BPlueTreeNode[] temp,int posn){
+		BPlueTreeNode[] arr = new BPlueTreeNode[2*this.order+1];
+		int count = 0;
+		for(BPlueTreeNode i : temp){
+			if(count == posn){
+				count++;
+			}
+			arr[count] = i;
+			count++;
+		}
+		return arr;
 	}
 	//Search the correct or apporimate location for an number of an BPlueTreeNode
 	public int BinarySearch(BPlusTreeNode obi){
 
 	}
+}
