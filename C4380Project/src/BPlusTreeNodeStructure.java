@@ -6,7 +6,7 @@ public class BPlusTreeNodeStructure {
 	private int[] indexs; //used for store the index
 	private BPlusTreeNode[] nextlevels; //used for connect to next level leaf
 	// nodeNum is total number of elements or index inside of this TreeNode
-	// nodePosn is the current posn of this node in parents
+	// nodePosn is the current posn of this node in parents.Starts from 0;
 	private int order,nodeNum,nodePosn;
 	//root
 	public BPlusTreeNode(int order){
@@ -150,22 +150,101 @@ public class BPlusTreeNodeStructure {
 		else{
 			//Split the nodes
 			//The root index should be (2*order)/2 Upper
-
+			//Make paerents first check parent is null or not
+			if(this.parents != null){
+				//For tampuary use only, parents insert will be copy the content only
+				BPlueTreeNode tempRoot = new BPlueTreeNode(this.order, this.posn,this.parents);
+			}
+			else{
+				//if parents is null, which means this node is the new root. sothat
+				BPlueTreeNode tempRoot = new BPlueTreeNode(this.order);
+			}
+			//Left - Right CHilds
+			BPlueTreeNode tempLeftLeaf = new BPlueTreeNode(this.order,0,tempRoot);
+			BPlueTreeNode tempRightLeaf = new BPlueTreeNode(this.order,1,tempRoot);
+			tempRoot.nextlevel[0] = tempLeftLeaf;
+			tempRoot.nextlevel[1] = tempRightLeaf;
 			// So check if the root num is one need to be added
+			Bool isObj = false; //use for sign paretns is obj or not
 			if(obj.nodeNum == (2*order)/2){
-				//is the top - move the left - right child to last of left child and firt in right child
-
+				//is the top - move the left - left child of obj to last of left childs  and right child of obj in right child
+				// However, since the left child supposed be the origjinal one, we could simplly keep it there
+				//Set root's index as obj - they are using same indexs
+				isObj = true;
 			}
 			else{//Not the top
-				//Find the top, Remove the top, insert the obj to correct posn 
+				//Find the top, Remove the top, insert the obj to correct posn
+
+
 			}
-
-
+			//move split current nodes to left and right
+			int count = 0;//Used for parents count indexs
+			int childCount = 0;// Used as child count index
+			int levelIndex = 0;//used as nextlevel index
+			for(BPlueTreeNode i : this.nextlevel){
+				if(count < ((2*order)/2)){
+					//check if the index number is obj's posn - If so, add obj
+					if(isObj && count == obj.nodePosn){
+						tempLeftLeaf.indexs[childCount] = obj.indexs[0];
+						//Update Obj's left child
+						tempLeftLeaf.nextlevel[levelIndex] = obj.nextlevel[0];
+						//Update Obj's right child
+						levelIndex++;
+						tempLeftLeaf.nextlevel[levelIndex] = obj.nextlevel[1];
+					}
+					else{
+						tempLeftLeaf.indexs[childCount] = this.indexs[count];
+						tempLeftLeaf.nextlevel[levelIndex] = this.nextlevel[count];
+					}
+				}
+				else if(count == ((2*order)/2)){
+					//Check if its obj as parents
+					if(isObj){
+						count++;
+						//assign obj's right child to tempRightLeaf
+						tempRightLeaf.nextlevel[0] = obj.nextlevel[1];
+						tempRoot.setIndexs(obj.indexs[0]);
+					}
+					//Original index as parents - remote that index, keep its left-right pointer safe
+					else{
+						int[] tempIndexs = new int[2*order];
+						tempIndexs[0] = this.indexs[(2*order)/2];
+						tempRoot.setIndexs(tempIndexs);
+						//Save its left child
+						tempLeftLeaf[levelIndex+1] = this.nextlevel[levelIndex+1];
+						//Save its right child
+						tempRightLeaf[0] = this.nextlevel[count+1];
+					}
+					//Re-init the levelIndex and childCount for right child
+					levelIndex = 0;//will be added 1 in the end of loop
+					childCount = -1;
+				}
+				else{
+					if(isObj){
+							tempRightLeaf.indexs[childCount] = obj.index[0];
+							//Update obj's left child to right child
+							tempRightLeaf.nextlevel[levelIndex] = obj.nextlevel[0];
+							//Update Obj's right child to right child
+							levelIndex++;
+							tempRightLeaf.nextlevel[levelIndex] = this.nextlevel[1];
+					}
+					else{
+						tempRightLeaf.indexs[childCount] = this.indexs[count];
+						tempRightLeaf.nextlevel[levelIndex ] = this.nextlevel[count ];
+					}
+				}
+				count++;
+				levelIndex++;
+				childCount++;
+			}
+			this.parents.insert(tempRoot);
 		}
+		reeturn res;
 	}
 	//Used for build the basic insertion of non-leaf node
 		//Find the correct spot,add the elements
 		//NEED to fix the child's posn
+		//Do not need to update parents - we are adding the content of obj to our origial node
 	public BPlueTreeNode insertBPNode(BPlueTreeNode subtree){
 		//move afterwards indexs and pointers - make 1 spot for target
 		//The POSN should be obj's POSN
