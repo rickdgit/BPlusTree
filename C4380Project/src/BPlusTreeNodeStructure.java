@@ -148,6 +148,18 @@ public class BPlusTreeNodeStructure {
 		}
 		//Recursive Case - split & make a new BPlueTreeNode and upload
 		else{
+			//Split the nodes
+			//The root index should be (2*order)/2 Upper
+
+			// So check if the root num is one need to be added
+			if(obj.nodeNum == (2*order)/2){
+				//is the top - move the left - right child to last of left child and firt in right child
+
+			}
+			else{//Not the top
+				//Find the top, Remove the top, insert the obj to correct posn 
+			}
+
 
 		}
 	}
