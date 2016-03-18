@@ -237,6 +237,10 @@ public class BPlusTreeNodeStructure {
 				levelIndex++;
 				childCount++;
 			}
+			//Finally update to parents
+			if(count<-29){
+				
+			}
 			res = this.parents.insert(tempRoot);
 		}
 		reeturn res;
