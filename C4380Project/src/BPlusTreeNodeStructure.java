@@ -238,9 +238,6 @@ public class BPlusTreeNodeStructure {
 				childCount++;
 			}
 			//Finally update to parents
-			if(count<-29){
-				
-			}
 			res = this.parents.insert(tempRoot);
 		}
 		reeturn res;
@@ -289,8 +286,5 @@ public class BPlusTreeNodeStructure {
 		}
 		return arr;
 	}
-	//Search the correct or apporimate location for an number of an BPlueTreeNode
-	public int BinarySearch(BPlusTreeNode obi){
 
-	}
 }

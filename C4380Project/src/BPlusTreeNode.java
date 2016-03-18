@@ -61,25 +61,36 @@ public class BPlusTreeNode {
 			int median = findMedian(this,searchKey);
 		}
 	}
-	public int findMedian(BPlusTreeNode bp,int searchKey){
-		//Check it is a leaf node or not
-		if(bp.getIndexs() == null){
+	//Insert the element(an IntNode) to current leaf(space avaliable)
+	public void insertElement(IntNode obj){
 
-		}
-		else{
-
-		}
-
-
-		return bp.getNodeNum()+searchKey;
 	}
-	//Used for search the location of searchKey OR used for search the apporixmate location of searchKey
-	public int binarySearch(int[] arr,int searchKey){
+	// Add obj to IntNode[] arr and return the new array
+	public IntNode[] mergeTwoIntNode(IntNode[] arr, IntNode obj){
+
+	}
+	//Used for search the corrent or appoimate location for an IntNode object
+	public int binarySearch(IntNode obj){
 		int res = 0;
 
 		return res;
 	}
-	//Used for get inserted values's left& right nodes
+	//Insertation methond for insert the non-leaf node
+	//IF spece avaliable - use base case otherwise use recursice case
+	public BPlusTreeNode insert(BPlusTreeNode obj){
+
+	}
+	//Used for non-leaf node's base case insertation
+	public BPlusTreeNode insertBPNode(BPlusTreeNode subtree){
+
+	}
+	//Make the empty pson avaliable
+	public int[] moveBack(int[] temp,int posn){
+
+	}
+	public BPlusTreeNode[] moveBack(BPlusTreeNode[] temp,int posn){
+
+	}
 
 	public void delete(int searchKey){
 
