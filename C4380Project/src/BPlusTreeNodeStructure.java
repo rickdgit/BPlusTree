@@ -237,7 +237,7 @@ public class BPlusTreeNodeStructure {
 				levelIndex++;
 				childCount++;
 			}
-			this.parents.insert(tempRoot);
+			res = this.parents.insert(tempRoot);
 		}
 		reeturn res;
 	}
