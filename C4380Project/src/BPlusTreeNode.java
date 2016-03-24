@@ -46,27 +46,30 @@ public class BPlusTreeNode {
 		this.nodeNum = 0;
 		this.nodePosn = nodePosn;
 	}
-	public void insert(int searchKey){
-
-
+	public BPlusTreeNode insert(IntNode obj){
+		//The return that need to return
+		BPlusTreeNode res = null;
 		//Base case
 			//Element or index could be inserted successfully
-		if(this.nodeNum<=(2*order-1)){
-
+		if(this.nodeNum<=(2*order)){
+			this.insertElement(obj);
+			return this;
 		}
 		//Recursive Case
 			//No space for insert, need to be split then recursively call parents insert
 		else{
 
-			int median = findMedian(this,searchKey);
 		}
 	}
 	//Insert the element(an IntNode) to current leaf(space avaliable)
 	public void insertElement(IntNode obj){
-
+		int posn = binarySearch(obj);
+		this.elements[posn] = obj;
+		this.nodeNum++;
 	}
 	// Add obj to IntNode[] arr and return the new array
 	public IntNode[] mergeTwoIntNode(IntNode[] arr, IntNode obj){
+		return arr;
 
 	}
 	//Used for search the corrent or appoimate location for an IntNode object
@@ -78,18 +81,45 @@ public class BPlusTreeNode {
 	//Insertation methond for insert the non-leaf node
 	//IF spece avaliable - use base case otherwise use recursice case
 	public BPlusTreeNode insert(BPlusTreeNode obj){
+		return obj;
 
 	}
 	//Used for non-leaf node's base case insertation
 	public BPlusTreeNode insertBPNode(BPlusTreeNode subtree){
+		return subtree;
 
 	}
 	//Make the empty pson avaliable
 	public int[] moveBack(int[] temp,int posn){
+		return temp;
 
 	}
 	public BPlusTreeNode[] moveBack(BPlusTreeNode[] temp,int posn){
+		return temp;
 
+	}
+	public String toString(){
+		return null;
+
+	}
+	public String nodeToString(){
+		String rs = "";
+		//Means it is leaf
+		if(this.elements != null){
+			//Loop and print out all the elements
+			rs += "This is an leaf";
+			for(IntNode i : this.elements){
+				rs += i.toString();
+			}
+		}else{
+		//Means it is non - leaf node
+		//Print out INT
+			rs += "This is an non-leaf";
+			for(int i : this.indexs){
+				rs += i+"";
+			}
+		}
+		return rs;
 	}
 
 	public void delete(int searchKey){
