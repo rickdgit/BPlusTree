@@ -1,3 +1,6 @@
+import BPlusTreeNode.BPlusTreeNode;
+import BPlusTreeNode.IntNode;
+
 //This code is for structure purpose only.Details and Errors would be ignored
 public class BPlusTreeNodeStructure {
 

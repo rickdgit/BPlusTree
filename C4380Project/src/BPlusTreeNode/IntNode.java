@@ -1,3 +1,4 @@
+package BPlusTreeNode;
 
 public class IntNode implements Comparable<IntNode>{
 	private int searchKey;
@@ -5,6 +6,10 @@ public class IntNode implements Comparable<IntNode>{
 	public IntNode(int searchKey){
 		this.setSearchKey(searchKey);
 		this.setSomeThing(null);
+	}
+	public IntNode(int searchKey,Object sth){
+		this.setSearchKey(searchKey);
+		this.setSomeThing(sth);
 	}
 	public int getSearchKey() {
 		return searchKey;

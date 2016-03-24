@@ -1,3 +1,4 @@
+package BPlusTreeNode;
 
 //Using Order as the minimal number of data in a bucket
 public class BPlusTreeNode {
@@ -53,13 +54,14 @@ public class BPlusTreeNode {
 			//Element or index could be inserted successfully
 		if(this.nodeNum<=(2*order)){
 			this.insertElement(obj);
-			return this;
+			res = this;
 		}
 		//Recursive Case
 			//No space for insert, need to be split then recursively call parents insert
 		else{
 
 		}
+		return res;
 	}
 	//Insert the element(an IntNode) to current leaf(space avaliable)
 	public void insertElement(IntNode obj){
