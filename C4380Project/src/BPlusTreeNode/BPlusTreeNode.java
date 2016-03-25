@@ -52,7 +52,7 @@ public class BPlusTreeNode {
 		BPlusTreeNode res = null;
 		//Base case
 			//Element or index could be inserted successfully
-		if(this.nodeNum<=(2*order)){
+		if(this.nodeNum<(2*order)){
 			this.insertElement(obj);
 			res = this;
 		}
@@ -66,6 +66,10 @@ public class BPlusTreeNode {
 	//Insert the element(an IntNode) to current leaf(space avaliable)
 	public void insertElement(IntNode obj){
 		int posn = binarySearch(obj);
+		//if elemetns is not empty ,need to move back
+		if( this.elements[0]!=null){
+			this.moveBack(posn,obj);
+		}
 		this.elements[posn] = obj;
 		this.nodeNum++;
 	}
@@ -75,9 +79,45 @@ public class BPlusTreeNode {
 
 	}
 	//Used for search the corrent or appoimate location for an IntNode object
+	//return value should be the one just bigger than target
+	//Which means return value should be moved back
+	//if duplicate, return the next posn of duplication, eg {1,2,4,5} => return 3 if search 4
 	public int binarySearch(IntNode obj){
 		int res = 0;
-
+		int toBeInserted = obj.getSearchKey();
+		//Using loop instead of recursion to write a BSearch
+		//If empty, insert directy
+		if(this.elements[0] == null){
+			// this.elements[0] = obj;
+			res = 0;
+		}
+		//First iteration : use linear serch instead of BSearch
+		else{
+			// int start = 0;
+			// int end = this.elements.length;
+			// int mid = 0;
+			// //Stop condition
+			// //arr[mid] = obj => find the target
+			// while(arr[mid]!= obj || start != end){
+			//
+			// }
+			if(this.elements[0].compareTo(obj) == 1){
+				res = 0;
+			}
+			else{
+				for(int i = 0; i < this.elements.length; i++){
+					//aescding order in this array
+					if(this.elements[i]!=null &&
+					(this.elements[i].compareTo(obj) == -1
+					|| this.elements[i].compareTo(obj) == 0)){
+						//loop all the smaller than obj elements,keep the last index of them
+						//res as the one in front of obj
+						res = i;
+					}
+				}
+				res++;
+			}
+		}
 		return res;
 	}
 	//Insertation methond for insert the non-leaf node
@@ -92,14 +132,35 @@ public class BPlusTreeNode {
 
 	}
 	//Make the empty pson avaliable
-	public int[] moveBack(int[] temp,int posn){
-		return temp;
+	// Object[] - input array which need to be moved
 
-	}
-	public BPlusTreeNode[] moveBack(BPlusTreeNode[] temp,int posn){
-		return temp;
+	public void moveBack(int posn,Object obj){
+		//Used for IntNode(Elements) / int(indexs) / BPlusTreeNode(nextlevels);
+		if(obj instanceof IntNode){
+			//In the condition that need to move IntNode element - insertation basic case
+			//add the object in to array
+			IntNode obj1 = (IntNode)obj;
 
+			for(int i = this.nodeNum+1 ; i > posn ;i--){
+				this.elements[i] = this.elements[i-1];
+			}
+//			int j = posn + 1;
+//			IntNode temp = this.elements[j];
+//			for(int i = posn ; i < this.nodeNum ;i++){
+//				
+//			}
+		}
+		else if(obj instanceof BPlusTreeNode){
+
+		}
+		else if(obj instanceof Integer){
+
+		}
+		else{
+
+		}
 	}
+
 	public String toString(){
 		return null;
 
@@ -109,9 +170,9 @@ public class BPlusTreeNode {
 		//Means it is leaf
 		if(this.elements != null){
 			//Loop and print out all the elements
-			rs += "This is an leaf";
-			for(IntNode i : this.elements){
-				rs += i.toString();
+			rs += "This is an leaf \n";
+			for(int i = 0; i<this.elements.length && this.elements[i] != null;i++){
+				rs+=this.elements[i].toString()+" ";
 			}
 		}else{
 		//Means it is non - leaf node

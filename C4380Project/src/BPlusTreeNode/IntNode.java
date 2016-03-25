@@ -28,10 +28,13 @@ public class IntNode implements Comparable<IntNode>{
 	public int compareTo(IntNode obj) {
 		// TODO Auto-generated method stub
 		int res = 0;
+		//this > obj => 1
+		//this = obj => 0
+		//this < obj =< -1
 		return  res = this.searchKey > obj.getSearchKey()?1:(this.searchKey == obj.getSearchKey()?0:-1);
 	}
 	public String toString(){
-		return this.searchKey+"\n";
+		return this.searchKey+" ";
 	}
 
 }
