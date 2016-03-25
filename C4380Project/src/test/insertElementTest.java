@@ -33,6 +33,23 @@ public class insertElementTest {
 		//insert to non-empty list
 		testNode.insertElement(new IntNode(1));
 		System.out.println(testNode.nodeToString());
+		
+		
+		//insert to non-empty list
+		testNode.insertElement(new IntNode(1));
+		System.out.println(testNode.nodeToString());
+		//insert to non-empty list
+		testNode.insertElement(new IntNode(1));
+		System.out.println(testNode.nodeToString());
+		//insert to non-empty list
+		testNode.insertElement(new IntNode(1));
+		System.out.println(testNode.nodeToString());
+		
+		System.out.println(testNode.getNodeNum());
+		
+		//insert to non-empty list
+		testNode.insertElement(new IntNode(9));
+		System.out.println(testNode.nodeToString());
 	}
 
 }

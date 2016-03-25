@@ -60,6 +60,7 @@ public class BPlusTreeNode {
 			//No space for insert, need to be split then recursively call parents insert
 		else{
 
+
 		}
 		return res;
 	}
@@ -141,13 +142,13 @@ public class BPlusTreeNode {
 			//add the object in to array
 			IntNode obj1 = (IntNode)obj;
 
-			for(int i = this.nodeNum+1 ; i > posn ;i--){
+			for(int i = this.nodeNum ; i > posn ;i--){
 				this.elements[i] = this.elements[i-1];
 			}
 //			int j = posn + 1;
 //			IntNode temp = this.elements[j];
 //			for(int i = posn ; i < this.nodeNum ;i++){
-//				
+//
 //			}
 		}
 		else if(obj instanceof BPlusTreeNode){
