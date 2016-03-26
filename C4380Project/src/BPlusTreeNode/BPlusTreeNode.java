@@ -92,14 +92,12 @@ public class BPlusTreeNode {
 
 			//Start setup root
 			int[] tempIndexs = new int[order*2];
-//			Int[] tempIndexs = new Int[order*2];
 			//make median as first index
 			tempIndexs[0] = tempInt[meadianPosn].getSearchKey();
 			//merge tempIndexs into index
 			temp.setIndexs(tempIndexs);
 			//Set nextlevels
 			BPlusTreeNode[] tempNextLevel = new BPlusTreeNode[2*order+1];
-//			BPlueTreeNode tempNextLevel = new BPlueTreeNode(2*order+1);
 			//Assign left
 			tempNextLevel[0] = this;
 			//Assign Right
@@ -134,7 +132,15 @@ public class BPlusTreeNode {
 				temp[i] = obj;
 				i++;
 			}
-			temp[i] = obj;
+			else if(i < posn){
+				temp[i] = this.elements[i];
+				i++;
+			}
+			else{
+				temp[i] = this.elements[i-1];
+				i++;
+				
+			}
 		}
 		arr = temp;
 		return arr;
