@@ -59,8 +59,59 @@ public class BPlusTreeNode {
 		//Recursive Case
 			//No space for insert, need to be split then recursively call parents insert
 		else{
+			//In this case, all elements are full, we need to expand one node to two node
+			//by making a new node with two child
+			IntNode[] tempInt = mergeTwoIntNode(this.elements,obj);
+			int meadianPosn = (2*order+1)/2;
+			IntNode medianObj = tempInt[meadianPosn];
 
+			//FIrst part - 0 => medianPosn -1
+			IntNode[] first = new IntNode[2*order];
+			//Second part - medianPosn => end
+			IntNode[] second = new IntNode[2*order];
 
+			int count = 0;
+			//Fill the list
+			for(IntNode i : tempInt){
+				if(count<meadianPosn){
+					//Fisrt part
+					first[count] = tempInt[count];
+				}
+				else{
+					second[count - meadianPosn] = tempInt[count];
+				}
+			}
+			//Start make new node - Root
+			BPlusTreeNode  temp = new BPlusTreeNode(this.order,this.nodePosn,this.parents);
+			//Declare right child
+			BPlusTreeNode tempRightLeaf = new BPlusTreeNode(this.order,1,this.parents,null,this);
+			//make left child - modify current node
+			this.setElements(first);
+			this.setNext(tempRightLeaf);
+			this.setParents(temp);
+
+			//Start setup root
+			int[] tempIndexs = new int[order*2];
+//			Int[] tempIndexs = new Int[order*2];
+			//make median as first index
+			tempIndexs[0] = tempInt[meadianPosn].getSearchKey();
+			//merge tempIndexs into index
+			temp.setIndexs(tempIndexs);
+			//Set nextlevels
+			BPlusTreeNode[] tempNextLevel = new BPlusTreeNode[2*order+1];
+//			BPlueTreeNode tempNextLevel = new BPlueTreeNode(2*order+1);
+			//Assign left
+			tempNextLevel[0] = this;
+			//Assign Right
+			tempNextLevel[0] = tempRightLeaf;
+			//Check parents avaliable - if not, this ndoe is the new one
+			if(this.parents == null){
+				res = this;
+			}
+			else{
+				res = this.parents.insert(temp);
+			}
+			return res;
 		}
 		return res;
 	}
@@ -76,8 +127,17 @@ public class BPlusTreeNode {
 	}
 	// Add obj to IntNode[] arr and return the new array
 	public IntNode[] mergeTwoIntNode(IntNode[] arr, IntNode obj){
+		IntNode[] temp = new IntNode[arr.length+1];
+		int i = 0,posn = binarySearch(obj);
+		while(i < temp.length){
+			if(i == posn){
+				temp[i] = obj;
+				i++;
+			}
+			temp[i] = obj;
+		}
+		arr = temp;
 		return arr;
-
 	}
 	//Used for search the corrent or appoimate location for an IntNode object
 	//return value should be the one just bigger than target
