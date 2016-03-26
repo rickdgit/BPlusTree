@@ -50,6 +50,7 @@ public class BPlusTreeNode {
 	public BPlusTreeNode insert(IntNode obj){
 		//The return that need to return
 		BPlusTreeNode res = null;
+		res = this.parents;
 		//Base case
 			//Element or index could be inserted successfully
 		if(this.nodeNum<(2*order)){
@@ -71,15 +72,19 @@ public class BPlusTreeNode {
 			IntNode[] second = new IntNode[2*order];
 
 			int count = 0;
+			int firstlength = 0, secondlength = 0;
 			//Fill the list
 			for(IntNode i : tempInt){
 				if(count<meadianPosn){
 					//Fisrt part
-					first[count] = tempInt[count];
+					first[count] = i;
+					firstlength++;
 				}
 				else{
-					second[count - meadianPosn] = tempInt[count];
+					second[count - meadianPosn] = i;
+					secondlength++;
 				}
+				count++;
 			}
 			//Start make new node - Root
 			BPlusTreeNode  temp = new BPlusTreeNode(this.order,this.nodePosn,this.parents);
@@ -89,7 +94,12 @@ public class BPlusTreeNode {
 			this.setElements(first);
 			this.setNext(tempRightLeaf);
 			this.setParents(temp);
-
+			this.setNodeNum(firstlength);
+			//Make right child - updatetempRightLeaf;
+			tempRightLeaf.setElements(second);
+			tempRightLeaf.setNodeNum(secondlength);
+			tempRightLeaf.setParents(temp);
+			
 			//Start setup root
 			int[] tempIndexs = new int[order*2];
 			//make median as first index
@@ -101,13 +111,15 @@ public class BPlusTreeNode {
 			//Assign left
 			tempNextLevel[0] = this;
 			//Assign Right
-			tempNextLevel[0] = tempRightLeaf;
-			//Check parents avaliable - if not, this ndoe is the new one
-			if(this.parents == null){
-				res = this;
+			tempNextLevel[1] = tempRightLeaf;
+			temp.setNextlevels(tempNextLevel);
+			temp.setNodeNum(1);
+			//Check parents avaliable - if not, this ndoe is the new one 
+			if(res != null){
+				res = this.parents.insert(temp);
 			}
 			else{
-				res = this.parents.insert(temp);
+				res = temp;
 			}
 			return res;
 		}
@@ -139,7 +151,7 @@ public class BPlusTreeNode {
 			else{
 				temp[i] = this.elements[i-1];
 				i++;
-				
+
 			}
 		}
 		arr = temp;
@@ -229,7 +241,24 @@ public class BPlusTreeNode {
 	}
 
 	public String toString(){
-		return null;
+		String res = "";
+		if(this.elements != null){
+			res += "This is a leaf node \n";
+			for(int i = 0; i < this.nodeNum ; i++){
+				res += this.elements[i].toString();
+			}
+		}
+		else{
+			res += "This is a non - leaf node\n";
+			for ( int i=0; i<this.nodeNum;i++){
+				res+= this.nextlevels[i].toString()+"\n";
+				res += "Index :"+ i+"\n";
+			}
+			res += "The last node\n";
+			res += this.nextlevels[nodeNum]+"\n";
+		}
+
+		return res;
 
 	}
 	public String nodeToString(){
