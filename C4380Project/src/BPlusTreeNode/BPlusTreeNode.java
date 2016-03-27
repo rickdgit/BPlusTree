@@ -99,7 +99,7 @@ public class BPlusTreeNode {
 			tempRightLeaf.setElements(second);
 			tempRightLeaf.setNodeNum(secondlength);
 			tempRightLeaf.setParents(temp);
-			
+
 			//Start setup root
 			int[] tempIndexs = new int[order*2];
 			//make median as first index
@@ -114,7 +114,7 @@ public class BPlusTreeNode {
 			tempNextLevel[1] = tempRightLeaf;
 			temp.setNextlevels(tempNextLevel);
 			temp.setNodeNum(1);
-			//Check parents avaliable - if not, this ndoe is the new one 
+			//Check parents avaliable - if not, this ndoe is the new one
 			if(res != null){
 				res = this.parents.insert(temp);
 			}
@@ -202,13 +202,39 @@ public class BPlusTreeNode {
 	//Insertation methond for insert the non-leaf node
 	//IF spece avaliable - use base case otherwise use recursice case
 	public BPlusTreeNode insert(BPlusTreeNode obj){
+		BPlusTreeNode res = null;
+		//Basic case: if this node's indexs is not empty, insert directly by calling insertBPNode methond
+		if(this.nodeNum < order*2){
+			res = insertBPNode(obj);
+		}
+		//Recursive case: if this node's indexs is full,build a new subtree and insert for parents
+		else{
+
+		}
+
+
 		return obj;
 
 	}
 	//Used for non-leaf node's base case insertation
 	public BPlusTreeNode insertBPNode(BPlusTreeNode subtree){
-		return subtree;
-
+		//put the subtree into current non-leaf node
+		//subtree's indexs[0] should be in this indexs's subtree.posn - we need to call moveBack
+		//subtree's left child stays where it is, add rightchild to posn+1's location
+		int posn = subtree.getNodePosn();
+		//Make spot avaliable for indexs and node
+		moveBack(posn,this.indexs);
+		moveBack(posn+1,this.nextlevels);
+		//assign the new node
+		//For indexs
+		this.indexs[posn] = subtree.getIndexs()[0];
+		//For right child
+		this.nextlevels[posn+1] = subtree.getNextlevels()[1];
+		//correct posn
+		this.nextlevels[posn+1].setNodePosn(posn+1);
+		//Left child stays where it was
+		this.nextlevels[posn].setNodePosn(posn);
+		return this;
 	}
 	//Make the empty pson avaliable
 	// Object[] - input array which need to be moved
@@ -230,10 +256,22 @@ public class BPlusTreeNode {
 //			}
 		}
 		else if(obj instanceof BPlusTreeNode){
+			//Used for moveback basic non-leaf insert case
+			//move nextlevels with an empty avaliable spot
 
+			//starts from nodeNum+1 since nextlevels is 2*order+1
+			for(int i = this.nodeNum+1;i>posn;i--){
+				this.nextlevels[i] = this.nextlevels[i-1];
+			}
 		}
 		else if(obj instanceof Integer){
+			//Used for moveback basic non-leaf case
+			//move indexs with an empty spot
 
+
+			for(int i = this.nodeNum ; i > posn ;i--){
+				this.indexs[i] = this.indexs[i-1];
+			}
 		}
 		else{
 
