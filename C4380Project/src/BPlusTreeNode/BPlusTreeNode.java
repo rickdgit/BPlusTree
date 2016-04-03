@@ -10,7 +10,7 @@ public class BPlusTreeNode {
 	// nodeNum is total number of elements or index inside of this TreeNode
 	// nodePosn is the current posn of this node in parents
 	private int order,nodeNum,nodePosn;
-	//root
+	//root - for init use
 	public BPlusTreeNode(int order){
 		this.setOrder(order);
 		this.setNodeNum(0);
@@ -18,9 +18,11 @@ public class BPlusTreeNode {
 		this.setParents(null);
 		this.setNext(null);
 		this.setPrev(null);
-		this.setElements(null);
-		this.setNextlevels(new BPlusTreeNode[order*2+1]);
-		this.setIndexs(new int[order*2]);
+		this.setElements(new IntNode[2*order]);
+		// this.setNextlevels(new BPlusTreeNode[order*2+1]);
+		// this.setIndexs(new int[order*2]);
+		this.setNextlevels(null);
+		this.setIndexs(null);
 
 	}
 	//middle node
@@ -116,12 +118,12 @@ public class BPlusTreeNode {
 			temp.setNodeNum(1);
 			//Check parents avaliable - if not, this ndoe is the new one
 			if(res != null){
-				res = this.parents.insert(temp);
+				res = this.parents.parents.insert(temp);
 			}
 			else{
 				res = temp;
 			}
-			return res;
+//			return res;
 		}
 		return res;
 	}
@@ -209,11 +211,12 @@ public class BPlusTreeNode {
 		}
 		//Recursive case: if this node's indexs is full,build a new subtree and insert for parents
 		else{
-
+			//This non-leaf node is full - split and make a new node and insert to parents
+			
 		}
 
 
-		return obj;
+		return res;
 
 	}
 	//Used for non-leaf node's base case insertation
@@ -223,8 +226,9 @@ public class BPlusTreeNode {
 		//subtree's left child stays where it is, add rightchild to posn+1's location
 		int posn = subtree.getNodePosn();
 		//Make spot avaliable for indexs and node
-		moveBack(posn,this.indexs);
-		moveBack(posn+1,this.nextlevels);
+		this.moveBack(posn,this.indexs[0]);
+		this.moveBack(posn+1,this.nextlevels[0]);
+		this.nodeNum++;
 		//assign the new node
 		//For indexs
 		this.indexs[posn] = subtree.getIndexs()[0];
@@ -232,6 +236,12 @@ public class BPlusTreeNode {
 		this.nextlevels[posn+1] = subtree.getNextlevels()[1];
 		//correct posn
 		this.nextlevels[posn+1].setNodePosn(posn+1);
+		// Update right child's next
+		if(this.nodeNum!= posn){
+			//right isn't last element of nodes
+			this.nextlevels[posn+1].setNext(this.nextlevels[posn+2]);
+		}
+		//Otheerwise is null
 		//Left child stays where it was
 		this.nextlevels[posn].setNodePosn(posn);
 		return this;
@@ -244,16 +254,10 @@ public class BPlusTreeNode {
 		if(obj instanceof IntNode){
 			//In the condition that need to move IntNode element - insertation basic case
 			//add the object in to array
-			IntNode obj1 = (IntNode)obj;
 
 			for(int i = this.nodeNum ; i > posn ;i--){
 				this.elements[i] = this.elements[i-1];
 			}
-//			int j = posn + 1;
-//			IntNode temp = this.elements[j];
-//			for(int i = posn ; i < this.nodeNum ;i++){
-//
-//			}
 		}
 		else if(obj instanceof BPlusTreeNode){
 			//Used for moveback basic non-leaf insert case
@@ -267,8 +271,6 @@ public class BPlusTreeNode {
 		else if(obj instanceof Integer){
 			//Used for moveback basic non-leaf case
 			//move indexs with an empty spot
-
-
 			for(int i = this.nodeNum ; i > posn ;i--){
 				this.indexs[i] = this.indexs[i-1];
 			}
@@ -277,7 +279,6 @@ public class BPlusTreeNode {
 
 		}
 	}
-
 	public String toString(){
 		String res = "";
 		if(this.elements != null){
@@ -295,9 +296,7 @@ public class BPlusTreeNode {
 			res += "The last node\n";
 			res += this.nextlevels[nodeNum]+"\n";
 		}
-
 		return res;
-
 	}
 	public String nodeToString(){
 		String rs = "";
