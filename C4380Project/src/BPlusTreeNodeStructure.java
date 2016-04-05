@@ -18,7 +18,7 @@ public class BPlusTreeNodeStructure {
 		this.setNodePosn(0);
 		this.setParents(null);
 		this.setNext(null);
-		this.setPrev(null);
+		this.setPrev(null); 
 		this.setElements(null);
 		this.setNextlevels(new BPlusTreeNode[order*2+1]);
 		this.setIndexs(new int[order*2]);

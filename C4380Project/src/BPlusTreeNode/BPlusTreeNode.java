@@ -1,5 +1,8 @@
 package BPlusTreeNode;
 
+import java.util.Arrays;
+import java.util.List;
+
 //Using Order as the minimal number of data in a bucket
 public class BPlusTreeNode {
 
@@ -280,9 +283,206 @@ public class BPlusTreeNode {
 		}
 		return rs;
 	}
+	
+	public boolean contains(int searchKey){
+		//contains is checking if the node contains the search key
+		for(int i=0;i<this.elements.length;i++){
+			if(this.elements[i].getSearchKey() == searchKey){
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	//remove elements in array
+	public void removeElements(Object[] myArray,int pos){
+		System.arraycopy(myArray, pos+1, myArray, pos, myArray.length-1-pos);
+	}
+	//remove node
+	public void removeKey(int searchkey){
+		
+		for(int i = 0; i < elements.length;i++ ){
+			if(elements[i].getSearchKey() == searchkey){
+				removeElements(elements,i);
+			}
+		}
+	}
+	
+	public void insertFront(IntNode[] myNode,IntNode node){
+		for(int i = myNode.length-1;i>0;i--){
+			myNode[i] = myNode[i-1];
+		}
+		myNode[0] = node;
+	}
+	
+	//insert elemet into first null position of array
+	public void insertArray(IntNode[] myNode,IntNode node){
+		for(int i = 0;i<myNode.length;i++){
+			if(myNode[i]==null){
+				myNode[i] = node;
+				break;
+			}
+		}
+	}
+	
 
-	public void delete(int searchKey){
 
+	public void delete(int searchKey,BPlusTreeNode tree){
+//		BPlusTreeNode res = null;
+//		res = this.parents;
+		
+		//if this is leaf node
+		if(this.nextlevels == null){
+			
+			//if not contains search key,just return 
+			if(!contains(searchKey)){
+				return;
+			}
+			
+			//if it's leaf node and also root node, just delete
+			if(this.getParents() == null){
+				removeKey(searchKey);
+			}else{
+				//if the node is more than half full, just delete
+				if(this.nodeNum>order && this.nodeNum >2){
+					removeKey(searchKey);
+				}else{
+					//if current node's nodenum <= order and its previous node's nodenum > order,
+					//then we can borrow from previous node(borrow form sibling)
+					if(this.prev !=null
+					   &&this.prev.getElements().length>order
+					   &&this.prev.getElements().length>2
+					   &&this.prev.getParents()==this.parents){
+//						int pos = this.prev.getElements().length;
+//						IntNode current  = null;
+//						current = this.prev.getElements()[pos-1];//get the borrow intNode;
+//						//insert the borrow node to the current node.
+//						this.insert(current);
+						
+						//get the last element from the previous node,insert it into elements,
+						//then delete it from previous node after borrow);
+						IntNode temp = null;
+						for(int i=0;i<prev.getElements().length;i++){
+							if(prev.getElements()[i]==null){
+								temp = prev.getElements()[i-1];
+								insertFront(elements,temp);
+								prev.getElements()[i-1]=null;
+								break;
+							}
+						}
+						
+						//change the parent node index value
+						parents.indexs[prev.nodePosn] = elements[0].getSearchKey();
+						
+						//then delete the key
+						removeKey(searchKey);
+					}//if current node's nodenum < order and its next node's nodenum> order,
+					 //then we can borrow form next node(borrow form sibling).
+					else if(this.next !=null
+							 &&this.next.getElements().length>order
+							 &&this.next.getElements().length>2
+							 &&this.next.getParents()==this.parents){
+						//get the first element of next node
+						IntNode temp = null;
+						temp = next.getElements()[0];
+						insertArray(elements,temp);
+						removeElements(next.getElements(),0);
+//						IntNode current = null;
+//						current = this.next.getElements()[0];
+//						this.insert(current);
+						//then delete the key
+						removeKey(searchKey);
+						
+						//change the parent node index value
+						parents.indexs[nodePosn] = next.getElements()[0].getSearchKey();
+					}//or we need to merge the node
+					else{
+						//two case: 
+						//
+						//
+						
+						//case1:merge with the previous node 
+						if(this.prev != null
+						   &&this.prev.getElements().length <= order
+						   &&this.prev.getParents() == this.parents){
+							//need insert front there 
+							
+							for(int i =0;i<this.prev.getElements().length;i++){
+								insert(this.prev.getElements()[i]);
+							}
+							removeKey(searchKey);
+						    //prev.setParents(null);
+							//prev.setElements(null);
+							//should remove previous node form this.parent
+							for(int j = 0; j<parents.getNextlevels().length;j++){
+								if(this.prev == parents.getNextlevels()[j]){
+									removeElements(parents.getNextlevels(),j);
+								}
+							}
+							
+							//update the connection 
+							if(prev.getPrev()!=null){
+								BPlusTreeNode temp = prev;
+								temp.getPrev().setNext(this);
+								prev = temp.getPrev();
+								temp.setNext(null);
+								temp.setPrev(null);
+							}else{
+								
+							}
+						}//case2:merge with the next node 
+						else if(next!=null
+								&&next.getElements().length<=order
+								&&next.getParents() == parents){
+							for(int i =0;i<this.next.getElements().length;i++){
+								insert(this.next.getElements()[i]);
+							}
+							removeKey(searchKey);
+							for(int k = 0; k<parents.getNextlevels().length;k++){
+								if(this.next == parents.getNextlevels()[k]){
+									removeElements(parents.getNextlevels(),k);
+								}
+							}
+							
+							//update the connection 
+							if(next.getNext()!=null){
+								BPlusTreeNode temp = next;
+								temp.getNext().setPrev(this);
+								next = temp.getNext();
+								temp.setNext(null);
+								temp.setPrev(null);
+							}else{
+								next.setPrev(null);
+								next = null;
+							}
+						}
+					}
+					
+				
+						
+				}
+			}
+			
+		}//if not leaf node
+		else{
+			//if the searchKey < the most left key of the node, search the first child node
+			if(searchKey < indexs[0]){
+				nextlevels[0].delete(searchKey, tree);
+			}//if the searchKey > the most right key of the node, search the last child node
+			else if(searchKey > indexs[indexs.length-1]){
+				nextlevels[nextlevels.length-1].delete(searchKey, tree);
+			}//or keep search the previous child node of which is > key
+			else{
+				for(int i=0;i<indexs.length;i++){
+					if(indexs[i] <= searchKey&& indexs[i+1]>searchKey){
+						nextlevels[i].delete(searchKey, tree);
+					}
+				}
+			}
+		}
+		
+		
 	}
 	public BPlusTreeNode search(int searchKey){
 		return null;
