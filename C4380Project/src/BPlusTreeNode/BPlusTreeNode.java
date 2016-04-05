@@ -204,7 +204,7 @@ public class BPlusTreeNode {
 	//Insertation methond for insert the non-leaf node
 	//IF spece avaliable - use base case otherwise use recursice case
 	public BPlusTreeNode insert(BPlusTreeNode obj){
-		BPlusTreeNode res = null;
+		BPlusTreeNode res = this.parents;
 		//Basic case: if this node's indexs is not empty, insert directly by calling insertBPNode methond
 		if(this.nodeNum < order*2){
 			res = insertBPNode(obj);
@@ -212,12 +212,118 @@ public class BPlusTreeNode {
 		//Recursive case: if this node's indexs is full,build a new subtree and insert for parents
 		else{
 			//This non-leaf node is full - split and make a new node and insert to parents
-			
+			//First, Get Ready for obj
+
+			//+1 means the obj that to be inserted need to be consindered
+			int midPosn = (2*order+1)/2;
+			//Does obj should be insert ahead of mid
+			boolean front=obj.getNodePosn()<midPosn;
+
+			//Making new Root
+			BPlusTreeNode temp = new BPlusTreeNode(this.order,this.nodePosn,this.parents);
+
+			//lfet child - nextlevels 0 -> midPosn ; indexs 0->midPosn -1
+			BPlusTreeNode left = new BPlusTreeNode(this.order,0,temp);
+
+			// right child - nextLevel midPosn -> end ; indexs midPosn+1 -> end
+			BPlusTreeNode right = new BPlusTreeNode(this.order,1,temp);
+
+
+			//Setup left
+			//for left next level
+			BPlusTreeNode[] leftNlevel = new BPlusTreeNode[2*order+1];
+			//for left indexs
+			int[] leftIndex = new int[2*order];
+			int i = 0;
+			while(i<midPosn){
+				if(front){
+
+					//nextlevel
+					leftNlevel[i]=this.getNextlevels()[i];
+					//indexs
+					leftIndex[i] = this.getIndexs()[i];
+					//Obj need to be consindered
+					if(i == (obj.getNodePosn()+1)){
+						i++;
+						leftNlevel[i] =obj.getNextlevels()[1];
+					}
+				}else{
+					//Don't consinder it
+					//nextlevel
+					leftNlevel[i]=this.getNextlevels()[i];
+					//indexs
+					leftIndex[i] = this.getIndexs()[i];
+				}
+				i++;
+			}
+			if(!front){
+				leftNlevel[midPosn] = this.getNextlevels()[midPosn];
+			}
+			//left nodeNum
+			left.setNodeNum(i);
+
+
+			//Setup right
+			//for right next level
+			BPlusTreeNode[] rightNlevel = new BPlusTreeNode[2*order+1];
+			//for right indexs
+			int[] rightIndex = new int[2*order];
+			i = midPosn+1;
+			while(i<2*order+1){
+				if(front){
+					//in front part , not in this part
+					//for right level
+					rightNlevel[i-midPosn-1] = this.getNextlevels()[i];
+					//for right indexs
+					rightIndex[i] = this.getIndexs()[i];
+				}
+				else{
+
+					//for right level
+					rightNlevel[i-midPosn-1] = this.getNextlevels()[i];
+					//for right indexs
+					rightIndex[i] = this.getIndexs()[i];
+					if(i == (obj.getNodePosn()+1)){
+						i++;
+						rightNlevel[i] = obj.getNextlevels()[1];
+					}
+				}
+				i++;
+			}
+			rightNlevel[2*order+1] = this.getNextlevels()[2*order+1];
+			//right nodeNum
+			right.setNodeNum(2*order - midPosn);
+
+
+			//Setup temp
+			BPlusTreeNode[] tempNextLevel = new BPlusTreeNode[2*order];
+			tempNextLevel[0] = left;
+			tempNextLevel[1] = right;
+
+			//Setup Indexs
+			int[] tempInt = new int[2*order];
+			tempInt[0] = obj.getNodePosn()==midPosn?obj.getIndexs()[0]:this.getIndexs()[midPosn];
+			temp.setIndexs(tempInt);
+
+			//Setup nodeNum
+			temp.nodeNum = 2;
+
+			//Finally Update "this" to left
+			// this = left;
+			this.setNodeNum(left.getNodeNum());
+			this.setNodePosn(left.getNodePosn());
+			this.setParents(left.getParents());
+			this.setNextlevels(left.getNextlevels());
+			this.setIndexs(left.getIndexs());
+
+			if(res != null){
+				res = this.parents.parents.insert(temp);
+			}
+			else{
+				res = temp;
+			}
 		}
-
-
 		return res;
-
 	}
 	//Used for non-leaf node's base case insertation
 	public BPlusTreeNode insertBPNode(BPlusTreeNode subtree){
