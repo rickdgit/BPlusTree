@@ -13,7 +13,7 @@ public class BPlusTreeNode {
 	// nodeNum is total number of elements or index inside of this TreeNode
 	// nodePosn is the current posn of this node in parents
 	private int order,nodeNum,nodePosn;
-	//root
+	//root - for init use
 	public BPlusTreeNode(int order){
 		this.setOrder(order);
 		this.setNodeNum(0);
@@ -21,9 +21,11 @@ public class BPlusTreeNode {
 		this.setParents(null);
 		this.setNext(null);
 		this.setPrev(null);
-		this.setElements(null);
-		this.setNextlevels(new BPlusTreeNode[order*2+1]);
-		this.setIndexs(new int[order*2]);
+		this.setElements(new IntNode[2*order]);
+		// this.setNextlevels(new BPlusTreeNode[order*2+1]);
+		// this.setIndexs(new int[order*2]);
+		this.setNextlevels(null);
+		this.setIndexs(null);
 
 	}
 	//middle node
@@ -102,7 +104,7 @@ public class BPlusTreeNode {
 			tempRightLeaf.setElements(second);
 			tempRightLeaf.setNodeNum(secondlength);
 			tempRightLeaf.setParents(temp);
-			
+
 			//Start setup root
 			int[] tempIndexs = new int[order*2];
 			//make median as first index
@@ -117,14 +119,14 @@ public class BPlusTreeNode {
 			tempNextLevel[1] = tempRightLeaf;
 			temp.setNextlevels(tempNextLevel);
 			temp.setNodeNum(1);
-			//Check parents avaliable - if not, this ndoe is the new one 
+			//Check parents avaliable - if not, this ndoe is the new one
 			if(res != null){
-				res = this.parents.insert(temp);
+				res = this.parents.parents.insert(temp);
 			}
 			else{
 				res = temp;
 			}
-			return res;
+//			return res;
 		}
 		return res;
 	}
@@ -205,13 +207,159 @@ public class BPlusTreeNode {
 	//Insertation methond for insert the non-leaf node
 	//IF spece avaliable - use base case otherwise use recursice case
 	public BPlusTreeNode insert(BPlusTreeNode obj){
-		return obj;
+		BPlusTreeNode res = this.parents;
+		//Basic case: if this node's indexs is not empty, insert directly by calling insertBPNode methond
+		if(this.nodeNum < order*2){
+			res = insertBPNode(obj);
+		}
+		//Recursive case: if this node's indexs is full,build a new subtree and insert for parents
+		else{
+			//This non-leaf node is full - split and make a new node and insert to parents
+			//First, Get Ready for obj
 
+			//+1 means the obj that to be inserted need to be consindered
+			int midPosn = (2*order+1)/2;
+			//Does obj should be insert ahead of mid
+			boolean front=obj.getNodePosn()<midPosn;
+
+			//Making new Root
+			BPlusTreeNode temp = new BPlusTreeNode(this.order,this.nodePosn,this.parents);
+
+			//lfet child - nextlevels 0 -> midPosn ; indexs 0->midPosn -1
+			BPlusTreeNode left = new BPlusTreeNode(this.order,0,temp);
+
+			// right child - nextLevel midPosn -> end ; indexs midPosn+1 -> end
+			BPlusTreeNode right = new BPlusTreeNode(this.order,1,temp);
+
+			//Setup left
+			//for left next level
+			BPlusTreeNode[] leftNlevel = new BPlusTreeNode[2*order+1];
+			//for left indexs
+			int[] leftIndex = new int[2*order];
+			int i = 0; //used for this.nextNextlevel index
+			int j = 0; //Used for left / right index
+			while(i<midPosn){
+				if(front){
+					//nextlevel
+					leftNlevel[j]=this.getNextlevels()[i];
+					//indexs
+					leftIndex[j] = this.getIndexs()[i];
+					//Obj need to be consindered
+					if( j == (obj.getNodePosn()+1)){
+						j++;
+						leftNlevel[j] =obj.getNextlevels()[1];
+					}
+				}else{
+					//Don't consinder it
+					//nextlevel
+					leftNlevel[i]=this.getNextlevels()[i];
+					//indexs
+					leftIndex[i] = this.getIndexs()[i];
+				}
+				i++;
+				j++;
+			}
+			if(!front){
+				leftNlevel[midPosn] = this.getNextlevels()[midPosn];
+			}
+			//left nodeNum
+			left.setNodeNum(i);
+
+
+			//Setup right
+			//for right next level
+			BPlusTreeNode[] rightNlevel = new BPlusTreeNode[2*order+1];
+			//for right indexs
+			int[] rightIndex = new int[2*order];
+			i = midPosn+1;
+			j = 0;
+			//If it is in front,which means the nextlevel[midPosn should in right]
+			if(front){
+				rightNlevel[0] = this.getNextlevels()[midPosn];
+				j++;
+			}
+
+			while(i<2*order){
+				if(front){
+					//in front part , not in this part
+					//for right level
+					rightNlevel[i-midPosn-1] = this.getNextlevels()[i];
+					//for right indexs
+					rightIndex[i] = this.getIndexs()[i];
+				}
+				else{
+					//for right level
+					rightNlevel[j] = this.getNextlevels()[i];
+					//for right indexs
+					rightIndex[j] = this.getIndexs()[i];
+					if(j == (obj.getNodePosn()+1)){
+						j++;
+						rightNlevel[i] = obj.getNextlevels()[1];
+					}
+				}
+				i++;
+				j++;
+			}
+			//right nodeNum
+			right.setNodeNum(2*order - midPosn);
+
+
+			//Setup temp
+			BPlusTreeNode[] tempNextLevel = new BPlusTreeNode[2*order];
+			tempNextLevel[0] = left;
+			tempNextLevel[1] = right;
+
+			//Setup Indexs
+			int[] tempInt = new int[2*order];
+			tempInt[0] = obj.getNodePosn()==midPosn?obj.getIndexs()[0]:this.getIndexs()[midPosn];
+			temp.setIndexs(tempInt);
+
+			//Setup nodeNum
+			temp.nodeNum = 2;
+
+			//Finally Update "this" to left
+			// this = left;
+			this.setNodeNum(left.getNodeNum());
+			this.setNodePosn(left.getNodePosn());
+			this.setParents(left.getParents());
+			this.setNextlevels(left.getNextlevels());
+			this.setIndexs(left.getIndexs());
+
+			if(res != null){
+				res = this.parents.parents.insert(temp);
+			}
+			else{
+				res = temp;
+			}
+		}
+		return res;
 	}
 	//Used for non-leaf node's base case insertation
 	public BPlusTreeNode insertBPNode(BPlusTreeNode subtree){
-		return subtree;
-
+		//put the subtree into current non-leaf node
+		//subtree's indexs[0] should be in this indexs's subtree.posn - we need to call moveBack
+		//subtree's left child stays where it is, add rightchild to posn+1's location
+		int posn = subtree.getNodePosn();
+		//Make spot avaliable for indexs and node
+		this.moveBack(posn,this.indexs[0]);
+		this.moveBack(posn+1,this.nextlevels[0]);
+		this.nodeNum++;
+		//assign the new node
+		//For indexs
+		this.indexs[posn] = subtree.getIndexs()[0];
+		//For right child
+		this.nextlevels[posn+1] = subtree.getNextlevels()[1];
+		//correct posn
+		this.nextlevels[posn+1].setNodePosn(posn+1);
+		// Update right child's next
+		if(this.nodeNum!= posn){
+			//right isn't last element of nodes
+			this.nextlevels[posn+1].setNext(this.nextlevels[posn+2]);
+		}
+		//Otheerwise is null
+		//Left child stays where it was
+		this.nextlevels[posn].setNodePosn(posn);
+		return this;
 	}
 	//Make the empty pson avaliable
 	// Object[] - input array which need to be moved
@@ -221,28 +369,31 @@ public class BPlusTreeNode {
 		if(obj instanceof IntNode){
 			//In the condition that need to move IntNode element - insertation basic case
 			//add the object in to array
-			IntNode obj1 = (IntNode)obj;
 
 			for(int i = this.nodeNum ; i > posn ;i--){
 				this.elements[i] = this.elements[i-1];
 			}
-//			int j = posn + 1;
-//			IntNode temp = this.elements[j];
-//			for(int i = posn ; i < this.nodeNum ;i++){
-//
-//			}
 		}
 		else if(obj instanceof BPlusTreeNode){
+			//Used for moveback basic non-leaf insert case
+			//move nextlevels with an empty avaliable spot
 
+			//starts from nodeNum+1 since nextlevels is 2*order+1
+			for(int i = this.nodeNum+1;i>posn;i--){
+				this.nextlevels[i] = this.nextlevels[i-1];
+			}
 		}
 		else if(obj instanceof Integer){
-
+			//Used for moveback basic non-leaf case
+			//move indexs with an empty spot
+			for(int i = this.nodeNum ; i > posn ;i--){
+				this.indexs[i] = this.indexs[i-1];
+			}
 		}
 		else{
 
 		}
 	}
-
 	public String toString(){
 		String res = "";
 		if(this.elements != null){
@@ -260,9 +411,7 @@ public class BPlusTreeNode {
 			res += "The last node\n";
 			res += this.nextlevels[nodeNum]+"\n";
 		}
-
 		return res;
-
 	}
 	public String nodeToString(){
 		String rs = "";
