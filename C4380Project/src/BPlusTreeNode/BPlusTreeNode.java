@@ -228,24 +228,23 @@ public class BPlusTreeNode {
 			// right child - nextLevel midPosn -> end ; indexs midPosn+1 -> end
 			BPlusTreeNode right = new BPlusTreeNode(this.order,1,temp);
 
-
 			//Setup left
 			//for left next level
 			BPlusTreeNode[] leftNlevel = new BPlusTreeNode[2*order+1];
 			//for left indexs
 			int[] leftIndex = new int[2*order];
-			int i = 0;
+			int i = 0; //used for this.nextNextlevel index
+			int j = 0; //Used for left / right index
 			while(i<midPosn){
 				if(front){
-
 					//nextlevel
-					leftNlevel[i]=this.getNextlevels()[i];
+					leftNlevel[j]=this.getNextlevels()[i];
 					//indexs
-					leftIndex[i] = this.getIndexs()[i];
+					leftIndex[j] = this.getIndexs()[i];
 					//Obj need to be consindered
-					if(i == (obj.getNodePosn()+1)){
-						i++;
-						leftNlevel[i] =obj.getNextlevels()[1];
+					if( j == (obj.getNodePosn()+1)){
+						j++;
+						leftNlevel[j] =obj.getNextlevels()[1];
 					}
 				}else{
 					//Don't consinder it
@@ -255,6 +254,7 @@ public class BPlusTreeNode {
 					leftIndex[i] = this.getIndexs()[i];
 				}
 				i++;
+				j++;
 			}
 			if(!front){
 				leftNlevel[midPosn] = this.getNextlevels()[midPosn];
@@ -269,7 +269,14 @@ public class BPlusTreeNode {
 			//for right indexs
 			int[] rightIndex = new int[2*order];
 			i = midPosn+1;
-			while(i<2*order+1){
+			j = 0;
+			//If it is in front,which means the nextlevel[midPosn should in right]
+			if(front){
+				rightNlevel[0] = this.getNextlevels()[midPosn];
+				j++;
+			}
+
+			while(i<2*order){
 				if(front){
 					//in front part , not in this part
 					//for right level
@@ -278,19 +285,18 @@ public class BPlusTreeNode {
 					rightIndex[i] = this.getIndexs()[i];
 				}
 				else{
-
 					//for right level
-					rightNlevel[i-midPosn-1] = this.getNextlevels()[i];
+					rightNlevel[j] = this.getNextlevels()[i];
 					//for right indexs
-					rightIndex[i] = this.getIndexs()[i];
-					if(i == (obj.getNodePosn()+1)){
-						i++;
+					rightIndex[j] = this.getIndexs()[i];
+					if(j == (obj.getNodePosn()+1)){
+						j++;
 						rightNlevel[i] = obj.getNextlevels()[1];
 					}
 				}
 				i++;
+				j++;
 			}
-			rightNlevel[2*order+1] = this.getNextlevels()[2*order+1];
 			//right nodeNum
 			right.setNodeNum(2*order - midPosn);
 

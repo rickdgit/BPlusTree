@@ -7,7 +7,7 @@ import org.junit.Test;
 import BPlusTreeNode.BPlusTreeNode;
 import BPlusTreeNode.IntNode;
 
-public class insertTestCase {
+public class insertBaseCaseTest {
 
 	@Test
 	public void test() {
