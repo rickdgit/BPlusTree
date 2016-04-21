@@ -1,4 +1,4 @@
-# BPlusTree 
+# BPlusTree
 B Plus Tree Data Structure
 ## Usage
 Target of this Repo is build a basic B Plus Tree data structure written by Java
@@ -12,7 +12,7 @@ Act as a special object that contains a searchKey(Option #2) with file reference
 C4380/src/BPlusTreeNode/BPlusTreeNode.java
 
 Act as the main structure of BPlusTree's node
-#####Constructor 
+#####Constructor
 
 order 		-	int				-	the order of BP tree
 
@@ -60,7 +60,13 @@ Used for delete the elements in BP Tree.
 No returning value
 ##Environment
   Eclipse Luna Release (4.4.0)
-  
+
   Atom 1.5.4
-  
+
   Java Version 1.8.0_74
+
+## ToDo List
+
+#####Use Binary Search instead of linear search in search element/index
+#####Re-organize variable/method's name
+#####Refactoring - Update Insertion Logic

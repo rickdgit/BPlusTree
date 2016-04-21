@@ -485,7 +485,7 @@ public class BPlusTreeNode {
 		myNode[0] = node;
 	}
 
-	//insert elemet into first null position of array
+	// insert elemet into first null position of array
 	public void insertArray(IntNode[] myNode,IntNode node){
 		for(int i = 0;i<myNode.length;i++){
 			if(myNode[i]==null){
